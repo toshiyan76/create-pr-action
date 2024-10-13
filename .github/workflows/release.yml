@@ -22,5 +22,5 @@ jobs:
         run: | # バージョニングスクリプトを実行して、リリースノートを生成
             git config --global user.name "${USERNAME}"
             git config --global user.email "${EMAIL}"
-            version="$(./github/scripts/bump.sh "${BUMP_LEVEL}")"
+            version="$(.github/scripts/bump.sh "${BUMP_LEVEL}")"
             gh release create "${version}" --title "${version}" --generate-notes
