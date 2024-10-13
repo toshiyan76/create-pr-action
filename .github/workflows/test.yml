@@ -1,0 +1,39 @@
+name: Test action
+on: pull_request
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actions のトークン
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # セットアップフェーズ。プッシュ対象のダミーファイルを作成する。
+      - uses: actions/checkout@v3
+      - name: Setup
+        run: date > foo.md
+
+      # テストフェーズ。action を実行する。
+      - name: Exercise
+        id: exercise
+        uses: ./
+        with:
+          message: Test
+
+      # 検証フェーズ。action の出力を検証する。
+      - name: Verify
+        run: |
+          set -x # デバッグ用
+          test "$(gh pr view "${BRANCH}" --json title --jq .title)" = "Test"
+        env:
+          BRANCH: ${{ steps.exercise.outputs.branch }}
+
+      # クリーンフェーズ。ダミーファイルを削除する。
+      - name: Teardown
+        if: ${{ always() }}
+        run: |
+          gh pr close "${BRANCH}" || true
+          git push origin "${BRANCH}" --delete || true
+        env:
+          BRANCH: ${{ steps.exercise.outputs.branch }}
