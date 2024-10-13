@@ -1,4 +1,4 @@
-name: Create PR
+name: Create-PR-action
 description: |
   変更したファイルをコミットし、PRを作成します。
   プルリクエストのタイトルや本文には、コミットメッセージがそのまま利用されます。
